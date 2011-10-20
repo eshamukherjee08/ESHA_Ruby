@@ -69,12 +69,12 @@ end
 class BusinessCenterHours 
   include Usable
  
-   @@update_date_hash, @@update_day_hash, @@close_day, @@close_date = {},{},[],[]
-   @@close_day << :sun
    attr_accessor :start_time, :end_time
    def initialize(start_time,end_time)
     #### Make start_time and end_time attribute accessors
       @start_time, @end_time = parse_time(start_time), parse_time(end_time)
+      @update_date_hash, @update_day_hash, @close_day, @close_date = {},{},[],[]
+      @close_day << :sun
    end
   
   
@@ -83,8 +83,8 @@ class BusinessCenterHours
     #### COMMENT  - Should be written as - date_day.is_a?(Symbol)
     start_t, end_t = parse_time(start_t), parse_time(end_t)
     (date_day.is_a?(Symbol)) ? 
-    (@@update_day_hash[date_day] = [start_t,end_t]) : 
-    (@@update_date_hash[date_day] = [start_t,end_t])
+    (@update_day_hash[date_day] = [start_t,end_t]) : 
+    (@update_date_hash[date_day] = [start_t,end_t])
     #### date_day.is_a?(Symbol) ? (@update_day_hash[$1] = [start_t,end_t]) : (@update_date_hash[date_day] = [start_t,end_t])    #check if value entered is day? 
   end
   
@@ -96,7 +96,7 @@ class BusinessCenterHours
     ### Can be written as -
     ### (/^([a-zA-Z]{3})$/ =~ c_day) ? (@close_day << c_day) : (@close_date << c_day)
     
-    c_day.is_a?(Symbol) ? (@@close_day << c_day) : (@@close_date << c_day)
+    c_day.is_a?(Symbol) ? (@close_day << c_day) : (@close_date << c_day)
   end
  
  
@@ -113,11 +113,11 @@ class BusinessCenterHours
     duration_req, in_date = duration*60, (num_converter(parser(app_date)))  
     # p in_date => :sat
     
-    if(@@update_date_hash.include?(app_date))
-      val = @@update_date_hash.values_at(app_date)
+    if(@update_date_hash.include?(app_date))
+      val = @update_date_hash.values_at(app_date)
       starting, ending = val[0][0], val[0][1]
-    elsif(@@update_day_hash.include?(in_date))
-      val = @@update_day_hash.values_at(in_date)
+    elsif(@update_day_hash.include?(in_date))
+      val = @update_day_hash.values_at(in_date)
       starting, ending = (val[0][0]), (val[0][1])
     else
       starting, ending = @start_time, @end_time
@@ -163,7 +163,7 @@ class BusinessCenterHours
   end
   
   def next_day_closed?(day, date)
-    @@close_date.include?(day) || @@close_date.include?(date)
+    @close_date.include?(day) || @close_date.include?(date)
   end
   
   
@@ -171,11 +171,11 @@ class BusinessCenterHours
   def get_s_e_time(app_date)                             
     in_date = num_converter(parser(app_date))
     
-    if(@@update_date_hash.include?(app_date))
-      val = @@update_date_hash.values_at(app_date)
+    if(@update_date_hash.include?(app_date))
+      val = @update_date_hash.values_at(app_date)
       starting,ending = (val[0][0]), (val[0][1])
-    elsif(@@update_day_hash.include?(in_date))
-      val = @@update_day_hash.values_at(in_date)
+    elsif(@update_day_hash.include?(in_date))
+      val = @update_day_hash.values_at(in_date)
       starting,ending = (val[0][0]), (val[0][1])
     else
       starting,ending = (@start_time),(@end_time)
@@ -188,10 +188,10 @@ class BusinessCenterHours
   def get_start(app_date)                                #function to get starting time for a day.
     in_date = num_converter(parser(app_date))
 
-    if(@@update_date_hash.include?(app_date))
-      @@update_date_hash.values_at(app_date)[0][0]
-    elsif(@@update_day_hash.include?(in_date))
-      @@update_day_hash.values_at(in_date)[0][0]
+    if(@update_date_hash.include?(app_date))
+      @update_date_hash.values_at(app_date)[0][0]
+    elsif(@update_day_hash.include?(in_date))
+      @update_day_hash.values_at(in_date)[0][0]
     else
       @start_time
     end
@@ -200,10 +200,10 @@ class BusinessCenterHours
   def get_end(app_date)                                 #function to get ending time for a day.
     in_date = num_converter(parser(app_date))
 
-    if(@@update_date_hash.include?(app_date))
-      @@update_date_hash.values_at(app_date)[0][1]
-    elsif(@@update_day_hash.include?(in_date))
-      @@update_day_hash.values_at(in_date)[0][1]
+    if(@update_date_hash.include?(app_date))
+      @update_date_hash.values_at(app_date)[0][1]
+    elsif(@update_day_hash.include?(in_date))
+      @update_day_hash.values_at(in_date)[0][1]
     else
       @end_time
     end
