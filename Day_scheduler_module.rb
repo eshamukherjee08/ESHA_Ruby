@@ -31,12 +31,15 @@ time1/time2 : used for subtracting time values.
 
 require 'date'
 module Usable
-  def parser(date)                                            #function to  day of week(0-6).
-    ## COMMENT - Should be written as - DateTime.strptime(date, "%b %d, %Y").wday directly, no need for variable
+  
+  # function to  day of week(0-6).
+  def parser(date)                                            
+    #### COMMENT - Should be written as - DateTime.strptime(date, "%b %d, %Y").wday directly, no need for variable
     DateTime.strptime(date, "%b %d, %Y").wday       #conversion to corresponding number.
   end
   
-  def num_converter(num)                                      #function to convert in day from number generated.
+  # function to convert in day from number generated.
+  def num_converter(num)                                      
     case num
     when 0 then :sun
     when 1 then :mon
@@ -49,9 +52,9 @@ module Usable
     end
   end
   
-  ## COMMENT - Use Time/Date/DateTime for time manipulations and calculations
+  #### COMMENT - Use Time/Date/DateTime for time manipulations and calculations
   def time_diff(time1,time2)              #function to calculate difference in time. 
-    m = (time1 > time2) ? ((time1-time2)/60) : ((time2-time1)/60)
+    (time1 > time2) ? ((time1-time2)/60) : ((time2-time1)/60)
   end
 end
 
@@ -61,36 +64,41 @@ class BusinessCenterHours
    @@update_date_hash, @@update_day_hash, @@close_day, @@close_date = Hash.new,Hash.new,Array.new,Array.new
    @@close_day << :sun
    
+  
   def initialize(start_time,end_time)
     @start_time, @end_time = (DateTime.strptime(start_time, "%H%M").to_time.utc), (DateTime.strptime(end_time, "%H%M").to_time.utc)
   end
   
-  def update(date_day,start_t,end_t)                           #Function to update timings on basis of day and date.
-    # COMMENT  - Should be written as - date_day.is_a?(Symbol)
+  
+   #Function to update timings on basis of day and date.
+  def update(date_day,start_t,end_t)      
+    #### COMMENT  - Should be written as - date_day.is_a?(Symbol)
+    
     start_t, end_t = (DateTime.strptime(start_t, "%H%M").to_time.utc), (DateTime.strptime(end_t, "%H%M").to_time.utc)
     (date_day.is_a?(Symbol)) ? (@@update_day_hash[date_day]=[start_t,end_t]) : (@@update_date_hash[date_day] = [start_t,end_t])
-    #date_day.is_a?(Symbol) ? (@@update_day_hash[$1] = [start_t,end_t]) : (@@update_date_hash[date_day] = [start_t,end_t])    #check if value entered is day? 
+    
+    #### date_day.is_a?(Symbol) ? (@@update_day_hash[$1] = [start_t,end_t]) : (@@update_date_hash[date_day] = [start_t,end_t])    #check if value entered is day? 
   end
   
-  def closed(c_day)                                           #to maintain list of holidays.
-    # COMMENT  - Should be written as - date_day.is_a?(Symbol)
-    # (/^([a-zA-Z]{3})$/ =~ c_day) ? 
+  
+  #to maintain list of holidays.
+  def closed(c_day)                                           
+    ### COMMENT  - Should be written as - date_day.is_a?(Symbol)
+    ### (/^([a-zA-Z]{3})$/ =~ c_day) ? 
     ### Can be written as -
-    # (/^([a-zA-Z]{3})$/ =~ c_day) ? (@@close_day << c_day) : (@@close_date << c_day)
+    ### (/^([a-zA-Z]{3})$/ =~ c_day) ? (@@close_day << c_day) : (@@close_date << c_day)
+    
     (c_day.is_a?(Symbol)) ? (@@close_day << c_day) : (@@close_date << c_day)
   end
  
-  def calculate_deadline(duration, app_date, app_time)            #function to check whether date is current or closed if yes terminates else calls schedular function.
+ 
+  #function to check whether date is current or closed if yes terminates else calls schedular function.
+  def calculate_deadline(duration, app_date, app_time)            
     app_time_client, app_date_client, app_time= app_time.dup, app_date.dup, (DateTime.strptime(app_time, "%H%M").to_time.utc)
-    if (Date.parse(app_date) <= Date.today)
-      app_date = (Date.parse(app_date)+1).strftime("%b %d,%Y")
-      scheduler(duration, app_date, app_time)                                     
-    else
-      scheduler(duration, app_date, app_time)
-    end
-    
+    (Date.parse(app_date) <= Date.today) ? scheduler(duration, (Date.parse(app_date)+1).strftime("%b %d,%Y") , app_time) : scheduler(duration, app_date, app_time)  
   end 
   
+ 
   def scheduler(duration, app_date, app_time)
     duration_req, in_date = ((duration)*60), (num_converter(parser(app_date)))  
     if(@@update_date_hash.include?(app_date))
@@ -103,13 +111,15 @@ class BusinessCenterHours
       starting, ending = (@start_time), (@end_time)
     end
     
-     if(app_time > ending)
-       flag, app_date = true, (Date.parse(app_date)+1).strftime("%b %d,%Y")
-       while(flag) do
-         in_date = num_converter(parser(app_date))
-         (@@close_day.include?(in_date) || @@close_date.include?(app_date)) ? (app_date = (Date.parse(app_date)+1).strftime("%b %d,%Y")) : (app_time, ending, flag = get_start(app_date), get_end(app_date), false)
-       end
+   if(app_time > ending)
+     flag, app_date = true, (Date.parse(app_date) + 1).strftime("%b %d,%Y")
+     while(flag) do
+       in_date = num_converter(parser(app_date))
+       (@@close_day.include?(in_date) || @@close_date.include?(app_date)) ? 
+        (app_date = (Date.parse(app_date)+1).strftime("%b %d,%Y")) : 
+        (app_time, ending, flag = get_start(app_date), get_end(app_date), false)
      end
+   end
     
     time_avail = time_diff(ending,app_time).to_i
     if duration_req < time_avail
@@ -141,7 +151,9 @@ class BusinessCenterHours
     end
   end
   
-  def get_s_e_time(app_date)                              #function to calculate working time duration for a day.
+  
+  # function to calculate working time duration for a day.
+  def get_s_e_time(app_date)                             
     in_date = num_converter(parser(app_date))
     if(@@update_date_hash.include?(app_date))
       val = @@update_date_hash.values_at(app_date)
@@ -152,38 +164,35 @@ class BusinessCenterHours
     else
       starting,ending = (@start_time),(@end_time)
     end
-    time_value = time_diff(ending,starting)
-    time_value
+    
+    time_diff(ending,starting)
   end                                                                                          
   
   
   def get_start(app_date)                                #function to get starting time for a day.
     in_date = num_converter(parser(app_date))
+
     if(@@update_date_hash.include?(app_date))
-      val = @@update_date_hash.values_at(app_date)
-      starting = (val[0][0])
+      @@update_date_hash.values_at(app_date)[0][0]
     elsif(@@update_day_hash.include?(in_date))
-      val = @@update_day_hash.values_at(in_date)
-      starting = (val[0][0])
+      @@update_day_hash.values_at(in_date)[0][0]
     else
-      starting = (@start_time)
+      (@start_time)
     end
-     starting
   end  
   
   def get_end(app_date)                                 #function to get ending time for a day.
     in_date = num_converter(parser(app_date))
+
     if(@@update_date_hash.include?(app_date))
-      val = @@update_date_hash.values_at(app_date)
-      ending = (val[0][1])
+      @@update_date_hash.values_at(app_date)[0][1]
     elsif(@@update_day_hash.include?(in_date))
-      val = @@update_day_hash.values_at(in_date)
-      ending = (val[0][1])
+      @@update_day_hash.values_at(in_date)[0][1]
     else
-      ending = (@end_time)
+      @end_time
     end
-     ending
   end
+  
 end
 
 h = BusinessCenterHours.new('0900','1500')
