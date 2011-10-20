@@ -2,10 +2,10 @@
 #### Use Time/Date/DateTime for time manipulations and calculations throughout 
 =begin
 Class Variables Used
-@@update_date_hash : to store updated dates
-@@update_day_hash : to store updated days.
-@@close_day : to store list of closed days.
-@@close_date : to store list of closed dates.
+@close_day : to store updated dates
+@update_date_hash : to store updated days.
+@close_day : to store list of closed days.
+@close_date : to store list of closed dates.
 
 Variables Used
 num : for converting digit to week day.
@@ -64,7 +64,6 @@ module Usable
   def next_date(date)
     (Date.parse(date) + 1).strftime("%b %d,%Y")
   end
-  
 end
 
 class BusinessCenterHours 
@@ -72,21 +71,21 @@ class BusinessCenterHours
  
    @@update_date_hash, @@update_day_hash, @@close_day, @@close_date = {},{},[],[]
    @@close_day << :sun
-     
-  def initialize(start_time,end_time)
+   attr_accessor :start_time, :end_time
+   def initialize(start_time,end_time)
     #### Make start_time and end_time attribute accessors
-    @start_time, @end_time = parse_time(start_time), parse_time(end_time)
-  end
+      @start_time, @end_time = parse_time(start_time), parse_time(end_time)
+   end
   
   
    #Function to update timings on basis of day and date.
   def update(date_day,start_t,end_t)      
     #### COMMENT  - Should be written as - date_day.is_a?(Symbol)
-    
     start_t, end_t = parse_time(start_t), parse_time(end_t)
-    (date_day.is_a?(Symbol)) ? (@@update_day_hash[date_day] = [start_t,end_t]) : (@@update_date_hash[date_day] = [start_t,end_t])
-    
-    #### date_day.is_a?(Symbol) ? (@@update_day_hash[$1] = [start_t,end_t]) : (@@update_date_hash[date_day] = [start_t,end_t])    #check if value entered is day? 
+    (date_day.is_a?(Symbol)) ? 
+    (@@update_day_hash[date_day] = [start_t,end_t]) : 
+    (@@update_date_hash[date_day] = [start_t,end_t])
+    #### date_day.is_a?(Symbol) ? (@update_day_hash[$1] = [start_t,end_t]) : (@update_date_hash[date_day] = [start_t,end_t])    #check if value entered is day? 
   end
   
   
@@ -95,7 +94,7 @@ class BusinessCenterHours
     ### COMMENT  - Should be written as - date_day.is_a?(Symbol)
     ### (/^([a-zA-Z]{3})$/ =~ c_day) ? 
     ### Can be written as -
-    ### (/^([a-zA-Z]{3})$/ =~ c_day) ? (@@close_day << c_day) : (@@close_date << c_day)
+    ### (/^([a-zA-Z]{3})$/ =~ c_day) ? (@close_day << c_day) : (@close_date << c_day)
     
     c_day.is_a?(Symbol) ? (@@close_day << c_day) : (@@close_date << c_day)
   end
@@ -164,7 +163,7 @@ class BusinessCenterHours
   end
   
   def next_day_closed?(day, date)
-    @@close_day.include?(day) || @@close_date.include?(date)
+    @@close_date.include?(day) || @@close_date.include?(date)
   end
   
   
@@ -220,6 +219,6 @@ h.closed(:thu)
 h.closed(:wed)
 h.closed("Dec 25,2011")
 h.calculate_deadline(7,"Dec 24,2011","1845")         #scheduling after time.
-# h.calculate_deadline(2,"Dec 30,2011","1400")         #scheduling normal date.
+h.calculate_deadline(2,"Dec 30,2011","1400")         #scheduling normal date.
 # h.calculate_deadline(1,"Dec 25,2011","1600")         #scheduling for holiday/closed date.
 # h.calculate_deadline(2,"Oct 18,2011","1600")        #scheduling for past date
