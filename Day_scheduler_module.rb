@@ -56,17 +56,26 @@ module Usable
   def time_diff(time1,time2)              #function to calculate difference in time. 
     (time1 > time2) ? ((time1-time2)/60) : ((time2-time1)/60)
   end
+  
+  def parse_time(time)
+    DateTime.strptime(time, "%H%M").to_time.utc
+  end
+  
+  def next_date(date)
+    (Date.parse(date) + 1).strftime("%b %d,%Y")
+  end
+  
 end
 
 class BusinessCenterHours 
   include Usable
  
-   @@update_date_hash, @@update_day_hash, @@close_day, @@close_date = Hash.new,Hash.new,Array.new,Array.new
+   @@update_date_hash, @@update_day_hash, @@close_day, @@close_date = {},{},[],[]
    @@close_day << :sun
-   
-  
+     
   def initialize(start_time,end_time)
-    @start_time, @end_time = (DateTime.strptime(start_time, "%H%M").to_time.utc), (DateTime.strptime(end_time, "%H%M").to_time.utc)
+    #### Make start_time and end_time attribute accessors
+    @start_time, @end_time = parse_time(start_time), parse_time(end_time)
   end
   
   
@@ -74,8 +83,8 @@ class BusinessCenterHours
   def update(date_day,start_t,end_t)      
     #### COMMENT  - Should be written as - date_day.is_a?(Symbol)
     
-    start_t, end_t = (DateTime.strptime(start_t, "%H%M").to_time.utc), (DateTime.strptime(end_t, "%H%M").to_time.utc)
-    (date_day.is_a?(Symbol)) ? (@@update_day_hash[date_day]=[start_t,end_t]) : (@@update_date_hash[date_day] = [start_t,end_t])
+    start_t, end_t = parse_time(start_t), parse_time(end_t)
+    (date_day.is_a?(Symbol)) ? (@@update_day_hash[date_day] = [start_t,end_t]) : (@@update_date_hash[date_day] = [start_t,end_t])
     
     #### date_day.is_a?(Symbol) ? (@@update_day_hash[$1] = [start_t,end_t]) : (@@update_date_hash[date_day] = [start_t,end_t])    #check if value entered is day? 
   end
@@ -88,57 +97,60 @@ class BusinessCenterHours
     ### Can be written as -
     ### (/^([a-zA-Z]{3})$/ =~ c_day) ? (@@close_day << c_day) : (@@close_date << c_day)
     
-    (c_day.is_a?(Symbol)) ? (@@close_day << c_day) : (@@close_date << c_day)
+    c_day.is_a?(Symbol) ? (@@close_day << c_day) : (@@close_date << c_day)
   end
  
  
   #function to check whether date is current or closed if yes terminates else calls schedular function.
-  def calculate_deadline(duration, app_date, app_time)            
-    app_time_client, app_date_client, app_time= app_time.dup, app_date.dup, (DateTime.strptime(app_time, "%H%M").to_time.utc)
-    (Date.parse(app_date) <= Date.today) ? scheduler(duration, (Date.parse(app_date)+1).strftime("%b %d,%Y") , app_time) : scheduler(duration, app_date, app_time)  
+  def calculate_deadline(duration, app_date, app_time)   
+             
+    app_time_client, app_date_client, app_time = app_time.dup, app_date.dup, parse_time(app_time)
+    (Date.parse(app_date) <= Date.today) ? scheduler(duration, next_date(app_date), app_time) : scheduler(duration, app_date, app_time)  
   end 
   
  
   def scheduler(duration, app_date, app_time)
-    duration_req, in_date = ((duration)*60), (num_converter(parser(app_date)))  
+    
+    duration_req, in_date = duration*60, (num_converter(parser(app_date)))  
+    # p in_date => :sat
+    
     if(@@update_date_hash.include?(app_date))
       val = @@update_date_hash.values_at(app_date)
-      starting, ending = (val[0][0]), (val[0][1])
+      starting, ending = val[0][0], val[0][1]
     elsif(@@update_day_hash.include?(in_date))
       val = @@update_day_hash.values_at(in_date)
       starting, ending = (val[0][0]), (val[0][1])
     else
-      starting, ending = (@start_time), (@end_time)
+      starting, ending = @start_time, @end_time
     end
     
+   ## if the meeting the after working hours - finds the next available working day  
    if(app_time > ending)
-     flag, app_date = true, (Date.parse(app_date) + 1).strftime("%b %d,%Y")
+     flag, app_date = true, next_date(app_date)
      while(flag) do
-       in_date = num_converter(parser(app_date))
-       (@@close_day.include?(in_date) || @@close_date.include?(app_date)) ? 
-        (app_date = (Date.parse(app_date)+1).strftime("%b %d,%Y")) : 
-        (app_time, ending, flag = get_start(app_date), get_end(app_date), false)
+       next_day_closed?(num_converter(parser(app_date)), app_date) ? 
+       (app_date = next_date(app_date)) : (app_time, ending, flag = get_start(app_date), get_end(app_date), false)
      end
    end
     
-    time_avail = time_diff(ending,app_time).to_i
+    time_avail = time_diff(ending, app_time).to_i
+    
     if duration_req < time_avail
-      target_time = (app_time+duration_req*60)
-      in_date = num_converter(parser(app_date))
-      puts "Deadline:  #{in_date}, #{app_date}, #{target_time.strftime("%H:%M:%S")}"
+      puts "Deadline:  #{num_converter(parser(app_date))}, #{app_date}, #{(app_time + duration_req * 60).strftime("%H:%M:%S")}"
+
     else
-      time_left, app_date_next, flag = duration_req-time_avail, Date.parse(app_date)+1, true
+      time_left, app_date_next, flag = duration_req - time_avail, Date.parse(app_date) + 1, true
       while(flag) do 
         date = app_date_next.strftime("%b %d,%Y")
         in_date = num_converter(parser(date))
-        if(@@close_day.include?(in_date) || @@close_date.include?(date))
-          app_date_next = app_date_next+1
+        
+        if next_day_closed?(in_date, date)
+          app_date_next = app_date_next + 1
         else
-          n_day = app_date_next.strftime("%b %d, %Y")
-          time_value = get_s_e_time(n_day)
-          time_left = (time_left-time_value)
-          if(time_left > 0)
-            app_date_next = app_date_next+1
+          time_value = get_s_e_time(app_date_next.strftime("%b %d, %Y"))
+          time_left -= time_value
+          if time_left > 0
+            app_date_next = app_date_next + 1
           else
              final_date = app_date_next.strftime("%b %d, %Y")
              final_date_start, time_left = get_start(final_date), ((time_value-time_left.abs).to_i)*60
@@ -151,10 +163,15 @@ class BusinessCenterHours
     end
   end
   
+  def next_day_closed?(day, date)
+    @@close_day.include?(day) || @@close_date.include?(date)
+  end
+  
   
   # function to calculate working time duration for a day.
   def get_s_e_time(app_date)                             
     in_date = num_converter(parser(app_date))
+    
     if(@@update_date_hash.include?(app_date))
       val = @@update_date_hash.values_at(app_date)
       starting,ending = (val[0][0]), (val[0][1])
@@ -177,7 +194,7 @@ class BusinessCenterHours
     elsif(@@update_day_hash.include?(in_date))
       @@update_day_hash.values_at(in_date)[0][0]
     else
-      (@start_time)
+      @start_time
     end
   end  
   
@@ -203,6 +220,6 @@ h.closed(:thu)
 h.closed(:wed)
 h.closed("Dec 25,2011")
 h.calculate_deadline(7,"Dec 24,2011","1845")         #scheduling after time.
-h.calculate_deadline(2,"Dec 30,2011","1400")         #scheduling normal date.
-h.calculate_deadline(1,"Dec 25,2011","1600")         #scheduling for holiday/closed date.
-h.calculate_deadline(2,"Oct 18,2011","1600")        #scheduling for past date
+# h.calculate_deadline(2,"Dec 30,2011","1400")         #scheduling normal date.
+# h.calculate_deadline(1,"Dec 25,2011","1600")         #scheduling for holiday/closed date.
+# h.calculate_deadline(2,"Oct 18,2011","1600")        #scheduling for past date
