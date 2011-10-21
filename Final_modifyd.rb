@@ -56,4 +56,4 @@ class Dictionary
 end
 
 d = Dictionary.new
-d.check("remisance")
+d.check("eshyank")
