@@ -54,6 +54,7 @@ module Usable
   
   #### COMMENT - Use Time/Date/DateTime for time manipulations and calculations
   def time_diff(time1,time2)              #function to calculate difference in time. 
+    puts time1
     (time1 > time2) ? ((time1-time2)/60) : ((time2-time1)/60)
   end
   
