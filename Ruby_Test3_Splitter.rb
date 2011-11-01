@@ -7,6 +7,8 @@ class Partition
       list_numbers << args[i]
     end
     list_num_input, list_numbers, sum = list_numbers, list_numbers.sort.reverse, sum_array(list_numbers)
+    p list_numbers
+    p sum
     (sum%part == 0) ? (partition(list_numbers,part,sum)) : (abort "Sorry! cannot perform partitioning.")
   end
   
@@ -25,7 +27,7 @@ class Partition
       list_numbers.shift
       }
     for i in 1..part
-      while(sum_array(partition_hash[i]) < (sum/part)) do
+      while(sum_array(partition_hash[i]) < (sum/part) and list_numbers != nil) do
         partition_hash[i] << list_numbers[0]
         list_numbers.shift 
       end
@@ -36,11 +38,12 @@ class Partition
   def sum_array(array)
     sum = 0
     array.each{|i| sum = sum+i}
-    sum
+    return sum
   end
 end
 
 a = Partition.new
-a.input(3,3,3,3,2,2,2,2,2,2,2,2,2)               #Test case 1
+#a.input(3,3,3,3,2,2,2,2,2,2,2,2,2)               #Test case 1
 #a.input(2,2,3,1,1,1)                            #Test case 2
 #a.input(9,1,1,1,1,1,1,1,1,1)                     # Test case 3
+a.input(2,9,12,14,17,23,32,34,40,42,49)

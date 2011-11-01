@@ -1,0 +1,22 @@
+<itemlist>
+    <item id="1">
+        <unit>USD</unit>
+        <price>39.43</price>
+    </item>
+    <item id="2">
+        <unit>CAD</unit>
+        <price>20.00</price>
+    </item>
+    <item id="3">
+        <unit>INR</unit>
+        <price>50.00</price>
+    </item>
+    <item id="4">
+        <unit>RYD</unit>
+        <price>40.00</price>
+    </item>
+    <item id="5">
+        <unit>CAD</unit>
+        <price>35.00</price>
+    </item>
+</itemlist>
