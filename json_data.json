@@ -1,0 +1,5 @@
+{
+  "USD-CAD" : {"unit_from" : "USD","unit_to" : "CAD","ratio" : "0.4137"},
+	"CAD-INR" : {"unit_from" : "CAD","unit_to" : "INR","ratio" : "0.6300"},
+	"RYD-USD" : {"unit_from" : "RYD","unit_to" : "USD","ratio" : "0.5823"}
+}
