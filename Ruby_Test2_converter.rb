@@ -36,6 +36,8 @@ class Converter
    
     def convert(id, unitTo)
         @path_conversion, item_unit, item_price = [], "", 0.0
+        
+        # Choose unit and preice for selected id
         @item_list_hash["item"].each do |item|
             if(id.to_s == item["id"])
                 item_unit, item_price = item["unit"][0], item["price"][0].to_f
