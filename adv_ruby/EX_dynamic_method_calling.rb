@@ -11,7 +11,7 @@ class Str < String
   end
   
   # Method to deconcatenate entered string.
-  def deconcat
+  def deconcatnating
     puts "The Deconcatenated String is:"
     val = @value.split(/\s/)
   end
@@ -22,7 +22,7 @@ puts "Enter string for performing function :"
 new_value = gets.chomp               # reading main string.
 a = Str.new("#{new_value}")          # creating object and initializing with main string.
 puts "Enter Function name to perform:-"
-puts "exclude?(\'sub string\') or deconcat : "
+puts "exclude?(\'sub string\') or deconcatnating : "
 a.instance_eval do
   function_name = gets.chomp      #reading function name to be executed.
   puts eval function_name
