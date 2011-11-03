@@ -8,14 +8,18 @@ module UseConverter
         while(true)
             @conv_list_hash.each do |r|
                 if(item_unit == r[0].split("-")[0])
-                    @path_conversion[@path_conversion.length], item_unit = r[0], r[0].split("-")[1]
+                    @path_conversion << r[0]
+                    item_unit = r[0].split("-")[1]
+                    break
                 elsif(item_unit == r[0].split("-")[1])
-                    @path_conversion[@path_conversion.length], item_unit = r[0], r[0].split("-")[0]
+                    @path_conversion << r[0]
+                    item_unit = r[0].split("-")[0]
+                    break
                 end
             end
             if(item_unit == unitTo)
               break
-            end
+            end 
         end
     end
     
@@ -56,7 +60,7 @@ class Converter
         
         #### unit_from.empty? 
         
-        if(unit_from != "")                       # when direct conversion exists.
+        if !(unit_from.empty?)                       # when direct conversion exists.
             final_calc = final_Calculation(unit_from, unitTo, item_price, ratio)
         else
             pathCalc(item_unit, unitTo)           #enters when direct conversion doesnot exists.
@@ -66,7 +70,7 @@ class Converter
                     if(index == r[0])
                         unit_from, unit_to, ratio = r[1]["unit_from"], r[1]["unit_to"], r[1]["ratio"].to_f
                     end
-                end
+                end                       
                 if(unit_from == item_unit)
                     item_unit, final_calc = unit_to, final_calc*ratio
                 else
@@ -78,10 +82,10 @@ class Converter
     end
 end
 
-# obj = Converter.new
+obj = Converter.new
 #obj.convert(3, "CAD")
 #obj.convert(4, "USD")
-# obj.convert(4, "CAD")
+obj.convert(4, "CAD")
 
 
-p XmlSimple.xml_in('xml_data.xml')
+#p XmlSimple.xml_in('xml_data.xml')
