@@ -36,19 +36,26 @@ class Converter
    
     def convert(id, unitTo)
         @path_conversion, item_unit, item_price = [], "", 0.0
-        
+
         # Choose unit and preice for selected id
+        # @item_list_hash["item"]
+
         @item_list_hash["item"].each do |item|
             if(id.to_s == item["id"])
                 item_unit, item_price = item["unit"][0], item["price"][0].to_f
             end    
         end
+        
         unit_from, unit_to, ratio, final_calc = "", "", 0.0, 0.0
         @conv_list_hash.each do |r|
             if(item_unit+"-"+unitTo == r[0] || unitTo+"-"+item_unit == r[0])
                 unit_from, ratio = r[1]["unit_from"], r[1]["ratio"].to_f
             end    
         end
+        
+        
+        #### unit_from.empty? 
+        
         if(unit_from != "")                       # when direct conversion exists.
             final_calc = final_Calculation(unit_from, unitTo, item_price, ratio)
         else
@@ -71,7 +78,10 @@ class Converter
     end
 end
 
-obj = Converter.new
+# obj = Converter.new
 #obj.convert(3, "CAD")
 #obj.convert(4, "USD")
-obj.convert(4, "CAD")
+# obj.convert(4, "CAD")
+
+
+p XmlSimple.xml_in('xml_data.xml')

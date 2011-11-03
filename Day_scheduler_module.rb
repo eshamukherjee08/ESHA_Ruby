@@ -67,6 +67,7 @@ module Usable
   end
 end
 
+##### COMMENT - Make @@update_date_hash, @@update_day_hash, @@close_day, @@close_date instance variables
 class BusinessCenterHours 
   include Usable
  
@@ -185,8 +186,8 @@ class BusinessCenterHours
     time_diff(ending,starting)
   end                                                                                          
   
-  
-  def get_start(app_date)                                #function to get starting time for a day.
+  # function to get starting time for a day.
+  def get_start(app_date)                                
     in_date = num_converter(parser(app_date))
 
     if(@update_date_hash.include?(app_date))
@@ -198,7 +199,8 @@ class BusinessCenterHours
     end
   end  
   
-  def get_end(app_date)                                 #function to get ending time for a day.
+  # function to get ending time for a day.
+  def get_end(app_date)                                 
     in_date = num_converter(parser(app_date))
 
     if(@update_date_hash.include?(app_date))

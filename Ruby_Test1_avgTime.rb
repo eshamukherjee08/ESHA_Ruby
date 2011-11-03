@@ -7,6 +7,7 @@ module TimeCalc
     DateTime.strptime(time, "%H%M").to_time.utc
   end
   
+  #### COMMENT - use array's in-built function
   # Method to return average.
   def average(min,max)
     average = (max - min)/2
