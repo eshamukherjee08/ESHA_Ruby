@@ -25,5 +25,6 @@ puts "Enter Function name to perform:-"
 puts "exclude?(\'sub string\') or deconcatnating : "
 a.instance_eval do
   function_name = gets.chomp      #reading function name to be executed.
-  puts eval function_name
+  puts eval function_name 
+  #puts self.send(function_name)
 end

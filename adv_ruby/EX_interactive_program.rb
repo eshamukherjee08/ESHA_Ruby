@@ -2,8 +2,8 @@ main_code = []
 read_line = gets.chomp
 while !(read_line.empty?) do
   # read_line.upcase != 'Q'
-  if(read_line == "q" || read_line == "Q")
-    abort ## use exit
+  if(read_line.upcase == 'Q')
+    exit ## use exit
   else
     main_code << read_line
     read_line = gets.chomp
