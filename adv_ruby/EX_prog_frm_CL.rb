@@ -11,4 +11,5 @@ class Object
     eval "#{line_of_code}"
   end
 end
+
 get_info
