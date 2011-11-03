@@ -14,28 +14,30 @@ module UseConverter
     begin
       @conv_list_hash.each do |r|
         if(item_unit == r[0].split("-")[0])
-          @path_conversion[@path_conversion.length], item_unit = r[0], r[0].split("-")[1]
+          @path_conversion << r[0]
+          item_unit = r[0].split("-")[1]
+          break
         elsif(item_unit == r[0].split("-")[1])
-          @path_conversion[@path_conversion.length], item_unit = r[0], r[0].split("-")[0]
+          @path_conversion << r[0]
+          item_unit = r[0].split("-")[0]
+          break
         end
+      end
+    end while(item_unit != unitTo)          
+  end  
 
-      end while(item_unit != unitTo)          
-    end  
-
-    # while(true)
-    #     @conv_list_hash.each do |r|
-    #         if(item_unit == r[0].split("-")[0])
-    #             @path_conversion[@path_conversion.length], item_unit = r[0], r[0].split("-")[1]
-    #         elsif(item_unit == r[0].split("-")[1])
-    #             @path_conversion[@path_conversion.length], item_unit = r[0], r[0].split("-")[0]
-    #         end
-    #     end
-    #     if(item_unit == unitTo)
-    #       break
-    #     end
-    # end
-  end
-
+  # while(true)
+  #     @conv_list_hash.each do |r|
+  #         if(item_unit == r[0].split("-")[0])
+  #             @path_conversion[@path_conversion.length], item_unit = r[0], r[0].split("-")[1]
+  #         elsif(item_unit == r[0].split("-")[1])
+  #             @path_conversion[@path_conversion.length], item_unit = r[0], r[0].split("-")[0]
+  #         end
+  #     end
+  #     if(item_unit == unitTo)
+  #       break
+  #     end
+  # end
 
   def final_Calculation(unit_from, unitTo, item_price, ratio)
     final_calc = (unit_from == unitTo) ? (item_price/ratio) : (item_price*ratio)
@@ -61,7 +63,6 @@ class Converter
       end    
     end
 
-
     unit_from, unit_to, ratio, final_calc = "", "", 0.0, 0.0
 
     found = @conv_list_hash.keys.find { |key| "#{item_unit}-#{unitTo}" == key  }        
@@ -73,19 +74,16 @@ class Converter
     #     end    
     # end
 
-
-
+    ### final_calc can be called with reversed arguments
 
     #### unit_from.empty? 
 
-    if(unit_from != "")                       # when direct conversion exists.
+    if !(unit_from.empty?)                       # when direct conversion exists.
       final_calc = final_Calculation(unit_from, unitTo, item_price, ratio)
     else
       pathCalc(item_unit, unitTo)           #enters when direct conversion doesnot exists.
       final_calc = item_price
-
       @path_conversion.each do |index|
-
         s = @conv_list_hash.select { |k,v| index == k}
         unit_from, unit_to, ratio = s[index]["unit_from"], s[index]["unit_to"], s[index]["ratio"].to_f
 
@@ -93,19 +91,17 @@ class Converter
         #   if(index == element[0])
         #     unit_from, unit_to, ratio = element[1]["unit_from"], element[1]["unit_to"], element[1]["ratio"].to_f
         #   end    
-        # end
-        
-        ### final_calc can be called with reversed arguments
+        # end  
         if(unit_from == item_unit)
           item_unit, final_calc = unit_to, final_calc*ratio
         else
           item_unit, final_calc = unit_from, final_calc/ratio
         end
-      end    
-    end
+      end ### do ends    
+    end # if ends
     puts "Conversion of Item id. #{id} to #{unitTo} is #{final_calc}\n\n"    
-  end
-end
+  end   # function ends 
+end # class ends
 
 obj = Converter.new
 #obj.convert(3, "CAD")
@@ -114,3 +110,4 @@ obj.convert(4, "CAD")
 
 
 # p XmlSimple.xml_in('xml_data.xml')
+#p XmlSimple.xml_in('xml_data.xml')
