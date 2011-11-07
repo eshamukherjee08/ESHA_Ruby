@@ -1,5 +1,8 @@
-puts "Enter name of csv file you want to read: "
-file_read = gets.chomp
+#### COMMENT - use variable for naming the class, not constant
+#### COMMENT - Create instance variables names from first row, and their values from subsequent rows
+
+# puts "Enter name of csv file you want to read: "
+file_read = "Persons"
 
 module Functioning
   
@@ -44,10 +47,11 @@ Class_var = Object.const_set(file_read, Class.new{
 
 
 arr = Class_var.new.reading_file
-arr[0].name
-arr[0].age
-arr[0].city
-arr[1].name
-arr[1].age
-arr[1].city
+p arr
+# arr[0].name
+# arr[0].age
+# arr[0].city
+# arr[1].name
+# arr[1].age
+# arr[1].city
         
