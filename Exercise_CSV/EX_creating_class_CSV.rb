@@ -8,11 +8,11 @@ module Functioning
   
   # Method to read file and create objects dynamically.
   def reading_file
-    file_name, counter, array_object, array_function = "#{Class_var}.csv", 0, [], []
+    file_name, counter, array_object, array_function = "#{Class_var}.csv", true, [], []
     File.open(file_name, "r") do |infile|
       while (line = infile.gets)
-        if(counter == 0)
-          array_function, counter = line.chomp.split(/,/), 1
+        if(counter)
+          array_function, counter = line.chomp.split(/,/), false
         else
           array_object << self.class.new("#{line}".chomp, array_function)
         end
