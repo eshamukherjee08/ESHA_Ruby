@@ -1,7 +1,7 @@
 ### eval is unsafe. 'send' can ve used instead. num1.send(operator, num2)
 ## Sample commit
 def calculate(num1,operator,num2)
-  puts eval "#{num1} #{operator.to_s} #{num2}"
+  puts num1.send(operator, num2)
 end
 
 calculate 3, :+, 2
