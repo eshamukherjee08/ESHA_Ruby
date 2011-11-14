@@ -40,7 +40,7 @@ end
 
 A.b = 1988 
 #p A.b 
-#p B.b
+p B.b
 B.b = "hi"
 p B.b
 p A.b
