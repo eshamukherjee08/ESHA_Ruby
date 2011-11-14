@@ -27,10 +27,5 @@ class Name
     end
   end
 end
-<<<<<<< HEAD
-p1 = Name.new
-p1.printt("Esha")
-=======
 p1 = Name.new("Esha","Mukherjee")
 puts p1
->>>>>>> e6ddaa0734f79ff2f0353e4d24f493a349b58404

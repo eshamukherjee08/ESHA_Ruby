@@ -14,7 +14,8 @@ module MyObjectStore
 
   module ClassMethods
     
-    def dynamic_function_creator(x,args) 
+    def dynamic_function_creator(x,args)
+      p self 
       self.instance_eval %{
         def find_by_#{x} param
           array_objects = MyObjectStore.class_variable_get(:@@array_objects)
