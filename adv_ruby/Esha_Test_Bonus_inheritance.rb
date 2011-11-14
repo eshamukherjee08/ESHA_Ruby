@@ -6,18 +6,18 @@ class Class
           if(instance_variable_get("@#{element}"))
             instance_variable_get("@#{element}")
           else
-            if(self.superclass.to_s != "Object")
+            if(self.superclass.name != "Object")
               self.superclass.send(element)
             end
           end
         end
 
         define_singleton_method("#{element}=") do |val|
-          if val.class == Array
+          if val.is_a?(Array)    # val.is_a?(Array)
             if(instance_variable_set("@#{element}",val))
               instance_variable_set("@#{element}",val)
             else
-              if(self.superclass.to_s != "Object")
+              if(self.superclass.name != "Object")
                 self.superclass.send(element)
               end
             end
@@ -37,6 +37,12 @@ end
 class B < A
   
 end 
+                 
+class C < A
+end
+
+class D < B
+end
 
 A.b = 1988 
 p A.b 
@@ -65,3 +71,6 @@ puts "----------------"
 A.a << 0
 p A.a
 p B.a
+             
+p C.a
+p D.a
